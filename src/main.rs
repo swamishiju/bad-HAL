@@ -16,68 +16,68 @@ unsafe extern "C" {
 }
 
 #[repr(C)]
-struct GPIO_GPRCM_Regs {
+struct GpioGPRCMRegs {
     PWREN: u32,
     RSTCTL: u32,
-    RESERVED0: [u32; 3],
+    reserved0: [u32; 3],
     STAT: u32,
 }
 
 #[repr(C)]
-struct GPIO_CPU_INT_Regs {
+struct GpioCpuIntRegs {
     IIDX: u32, /* !< (@ 0x00001020) Interrupt index */
-    RESERVED0: u32,
+    reserved0: u32,
     IMASK: u32, /* !< (@ 0x00001028) Interrupt mask */
-    RESERVED1: u32,
+    reserved1: u32,
     RIS: u32, /* !< (@ 0x00001030) Raw interrupt status */
-    RESERVED2: u32,
+    reserved2: u32,
     MIS: u32, /* !< (@ 0x00001038) Masked interrupt status */
-    RESERVED3: u32,
+    reserved3: u32,
     ISET: u32, /* !< (@ 0x00001040) Interrupt set */
-    RESERVED4: u32,
+    reserved4: u32,
     ICLR: u32, /* !< (@ 0x00001048) Interrupt clear */
 }
 
 #[repr(C)]
 struct GPIO_GEN_EVENT0_Regs {
     IIDX: u32, /* !< (@ 0x00001050) Interrupt index */
-    RESERVED0: u32,
+    reserved0: u32,
     IMASK: u32, /* !< (@ 0x00001058) Interrupt mask */
-    RESERVED1: u32,
+    reserved1: u32,
     RIS: u32, /* !< (@ 0x00001060) Raw interrupt status */
-    RESERVED2: u32,
+    reserved2: u32,
     MIS: u32, /* !< (@ 0x00001068) Masked interrupt status */
-    RESERVED3: u32,
+    reserved3: u32,
     ISET: u32, /* !< (@ 0x00001070) Interrupt set */
-    RESERVED4: u32,
+    reserved4: u32,
     ICLR: u32, /* !< (@ 0x00001078) Interrupt clear */
 }
 
 #[repr(C)]
-struct GPIO_Reg {
-    RESERVED0: [u32; 256],
+struct GpioReg {
+    reserved0: [u32; 256],
     FSUB_0: u32, /* !< (@ 0x00000400) Subsciber Port 0 */
     FSUB_1: u32, /* !< (@ 0x00000404) Subscriber Port 1 */
-    RESERVED1: [u32; 15],
+    reserved1: [u32; 15],
     FPUB_0: u32, /* !< (@ 0x00000444) Publisher Port 0 */
     FPUB_1: u32, /* !< (@ 0x00000448) Publisher Port 1 */
-    RESERVED2: [u32; 237],
-    GPRCM: GPIO_GPRCM_Regs, /* !< (@ 0x00000800) */
-    RESERVED3: [u32; 510],
+    reserved2: [u32; 237],
+    GPRCM: GpioGPRCMRegs, /* !< (@ 0x00000800) */
+    reserved3: [u32; 510],
     CLKOVR: u32, /* !< (@ 0x00001010) Clock Override */
-    RESERVED4: u32,
+    reserved4: u32,
     PDBGCTL: u32, /* !< (@ 0x00001018) Peripheral Debug Control */
-    RESERVED5: u32,
-    CPU_INT: GPIO_CPU_INT_Regs, /* !< (@ 0x00001020) */
-    RESERVED6: u32,
+    reserved5: u32,
+    CPU_INT: GpioCpuIntRegs, /* !< (@ 0x00001020) */
+    reserved6: u32,
     GEN_EVENT0: GPIO_GEN_EVENT0_Regs, /* !< (@ 0x00001050) */
-    RESERVED7: u32,
+    reserved7: u32,
     GEN_EVENT1: GPIO_GEN_EVENT0_Regs, /* !< (@ 0x00001080) */
-    RESERVED8: [u32; 13],
+    reserved8: [u32; 13],
     EVT_MODE: u32, /* !< (@ 0x000010E0) Event Mode */
-    RESERVED9: [u32; 6],
+    reserved9: [u32; 6],
     DESC: u32, /* !< (@ 0x000010FC) Module Description */
-    RESERVED10: [u32; 64],
+    reserved10: [u32; 64],
     DOUT3_0: u32,   /* !< (@ 0x00001200) Data output 3 to 0 */
     DOUT7_4: u32,   /* !< (@ 0x00001204) Data output 7 to 4 */
     DOUT11_8: u32,  /* !< (@ 0x00001208) Data output 11 to 8 */
@@ -86,21 +86,21 @@ struct GPIO_Reg {
     DOUT23_20: u32, /* !< (@ 0x00001214) Data output 23 to 20 */
     DOUT27_24: u32, /* !< (@ 0x00001218) Data output 27 to 24 */
     DOUT31_28: u32, /* !< (@ 0x0000121C) Data output 31 to 28 */
-    RESERVED11: [u32; 24],
+    reserved11: [u32; 24],
     DOUT31_0: u32, /* !< (@ 0x00001280) Data output 31 to 0 */
-    RESERVED12: [u32; 3],
+    reserved12: [u32; 3],
     DOUTSET31_0: u32, /* !< (@ 0x00001290) Data output set 31 to 0 */
-    RESERVED13: [u32; 3],
+    reserved13: [u32; 3],
     DOUTCLR31_0: u32, /* !< (@ 0x000012A0) Data output clear 31 to 0 */
-    RESERVED14: [u32; 3],
+    reserved14: [u32; 3],
     DOUTTGL31_0: u32, /* !< (@ 0x000012B0) Data output toggle 31 to 0 */
-    RESERVED15: [u32; 3],
+    reserved15: [u32; 3],
     DOE31_0: u32, /* !< (@ 0x000012C0) Data output enable 31 to 0 */
-    RESERVED16: [u32; 3],
+    reserved16: [u32; 3],
     DOESET31_0: u32, /* !< (@ 0x000012D0) Data output enable set 31 to 0 */
-    RESERVED17: [u32; 3],
+    reserved17: [u32; 3],
     DOECLR31_0: u32, /* !< (@ 0x000012E0) Data output enable clear 31 to 0 */
-    RESERVED18: [u32; 7],
+    reserved18: [u32; 7],
     DIN3_0: u32,   /* !< (@ 0x00001300) Data input 3 to 0 */
     DIN7_4: u32,   /* !< (@ 0x00001304) Data input 7 to 4 */
     DIN11_8: u32,  /* !< (@ 0x00001308) Data input 11 to 8 */
@@ -109,27 +109,27 @@ struct GPIO_Reg {
     DIN23_20: u32, /* !< (@ 0x00001314) Data input 23 to 20 */
     DIN27_24: u32, /* !< (@ 0x00001318) Data input 27 to 24 */
     DIN31_28: u32, /* !< (@ 0x0000131C) Data input 31 to 28 */
-    RESERVED19: [u32; 24],
+    reserved19: [u32; 24],
     DIN31_0: u32, /* !< (@ 0x00001380) Data input 31 to 0 */
-    RESERVED20: [u32; 3],
+    reserved20: [u32; 3],
     POLARITY15_0: u32, /* !< (@ 0x00001390) Polarity 15 to 0 */
-    RESERVED21: [u32; 3],
+    reserved21: [u32; 3],
     POLARITY31_16: u32, /* !< (@ 0x000013A0) Polarity 31 to 16 */
-    RESERVED22: [u32; 23],
+    reserved22: [u32; 23],
     CTL: u32,      /* !< (@ 0x00001400) FAST WAKE GLOBAL EN */
     FASTWAKE: u32, /* !< (@ 0x00001404) FAST WAKE ENABLE */
-    RESERVED23: [u32; 62],
+    reserved23: [u32; 62],
     SUB0CFG: u32, /* !< (@ 0x00001500) Subscriber 0 configuration */
-    RESERVED24: u32,
+    reserved24: u32,
     FILTEREN15_0: u32,  /* !< (@ 0x00001508) Filter Enable 15 to 0 */
     FILTEREN31_16: u32, /* !< (@ 0x0000150C) Filter Enable 31 to 16 */
     DMAMASK: u32,       /* !< (@ 0x00001510) DMA Write MASK */
-    RESERVED25: [u32; 3],
+    reserved25: [u32; 3],
     SUB1CFG: u32, /* !< (@ 0x00001520) Subscriber 1 configuration */
 }
 
-impl GPIO_Reg {
-    fn gpio_reset(&mut self) {
+impl GpioReg {
+    fn reset(&mut self) {
         const GPIO_RSTCTL_KEY_UNLOCK_W: u32 = 0xB1000000;
         const GPIO_RSTCTL_RESETSTKYCLR_CLR: u32 = 0x00000002;
         const GPIO_RSTCTL_RESETASSERT_ASSERT: u32 = 0x00000001;
@@ -138,7 +138,7 @@ impl GPIO_Reg {
             | GPIO_RSTCTL_RESETASSERT_ASSERT;
     }
 
-    fn gpio_enable_power(&mut self) {
+    fn enable_power(&mut self) {
         const GPIO_PWREN_KEY_UNLOCK_W: u32 = 0x26000000;
         const GPIO_PWREN_ENABLE_ENABLE: u32 = 0x00000001;
         self.GPRCM.PWREN = GPIO_PWREN_KEY_UNLOCK_W | GPIO_PWREN_ENABLE_ENABLE;
@@ -172,7 +172,7 @@ impl GPIO_Reg {
 
 #[repr(C)]
 struct IOMUX_SECCFG_Regs {
-    RESERVED0: u32,
+    reserved0: u32,
     PINCM: [u32; 251],
 }
 
@@ -183,27 +183,27 @@ struct IOMUX_Regs {
 
 #[repr(C)]
 struct SYSCTL_SOCLOCK_Regs {
-    RESERVED0: [u32; 8],
+    reserved0: [u32; 8],
     IIDX: u32, /* !< (@ 0x00001020) SYSCTL interrupt index */
-    RESERVED1: u32,
+    reserved1: u32,
     IMASK: u32, /* !< (@ 0x00001028) SYSCTL interrupt mask */
-    RESERVED2: u32,
+    reserved2: u32,
     RIS: u32, /* !< (@ 0x00001030) SYSCTL raw interrupt status */
-    RESERVED3: u32,
+    reserved3: u32,
     MIS: u32, /* !< (@ 0x00001038) SYSCTL masked interrupt status */
-    RESERVED4: u32,
+    reserved4: u32,
     ISET: u32, /* !< (@ 0x00001040) SYSCTL interrupt set */
-    RESERVED5: u32,
+    reserved5: u32,
     ICLR: u32, /* !< (@ 0x00001048) SYSCTL interrupt clear */
-    RESERVED6: u32,
+    reserved6: u32,
     NMIIIDX: u32, /* !< (@ 0x00001050) NMI interrupt index */
-    RESERVED7: [u32; 3],
+    reserved7: [u32; 3],
     NMIRIS: u32, /* !< (@ 0x00001060) NMI raw interrupt status */
-    RESERVED8: [u32; 3],
+    reserved8: [u32; 3],
     NMIISET: u32, /* !< (@ 0x00001070) NMI interrupt set */
-    RESERVED9: u32,
+    reserved9: u32,
     NMIICLR: u32, /* !< (@ 0x00001078) NMI interrupt clear */
-    RESERVED10: [u32; 33],
+    reserved10: [u32; 33],
     SYSOSCCFG: u32,   /* !< (@ 0x00001100) SYSOSC configuration */
     MCLKCFG: u32,     /* !< (@ 0x00001104) Main clock (MCLK) configuration */
     HSCLKEN: u32,     /* !< (@ 0x00001108) High-speed clock (HSCLK) source enable/disable */
@@ -211,26 +211,26 @@ struct SYSCTL_SOCLOCK_Regs {
     HFCLKCLKCFG: u32, /* !< (@ 0x00001110) High-frequency clock (HFCLK) configuration */
     LFCLKCFG: u32,    /* !< (@ 0x00001114) Low frequency crystal oscillator (LFXT)
                       configuration */
-    RESERVED11: [u32; 8],
+    reserved11: [u32; 8],
     GENCLKCFG: u32, /* !< (@ 0x00001138) General clock configuration */
     GENCLKEN: u32,  /* !< (@ 0x0000113C) General clock enable control */
     PMODECFG: u32,  /* !< (@ 0x00001140) Power mode configuration */
-    RESERVED12: [u32; 3],
+    reserved12: [u32; 3],
     FCC: u32, /* !< (@ 0x00001150) Frequency clock counter (FCC) count */
-    RESERVED13: [u32; 7],
+    reserved13: [u32; 7],
     SYSOSCTRIMUSER: u32, /* !< (@ 0x00001170) SYSOSC user-specified trim */
-    RESERVED14: u32,
+    reserved14: u32,
     SRAMBOUNDARY: u32, /* !< (@ 0x00001178) SRAM Write Boundary */
-    RESERVED15: u32,
+    reserved15: u32,
     SYSTEMCFG: u32, /* !< (@ 0x00001180) System configuration */
-    RESERVED16: [u32; 31],
+    reserved16: [u32; 31],
     WRITELOCK: u32,  /* !< (@ 0x00001200) SYSCTL register write lockout */
     CLKSTATUS: u32,  /* !< (@ 0x00001204) Clock module (CKM) status */
     SYSSTATUS: u32,  /* !< (@ 0x00001208) System status information */
     DEDERRADDR: u32, /* !< (@ 0x0000120C) Memory DED Address */
-    RESERVED17: [u32; 4],
+    reserved17: [u32; 4],
     RSTCAUSE: u32, /* !< (@ 0x00001220) Reset cause */
-    RESERVED18: [u32; 55],
+    reserved18: [u32; 55],
     RESETLEVEL: u32, /* !< (@ 0x00001300) Reset level for application-triggered reset
                      command */
     RESETCMD: u32, /* !< (@ 0x00001304) Execute an application-triggered reset command */
@@ -244,7 +244,7 @@ struct SYSCTL_SOCLOCK_Regs {
     SYSSTATUSCLR: u32, /* !< (@ 0x00001324) Clear sticky bits of SYSSTATUS */
     SWDCFG: u32,   /* !< (@ 0x00001328) Disable the SWD function on the SWD pins */
     FCCCMD: u32,   /* !< (@ 0x0000132C) Frequency clock counter start capture */
-    RESERVED19: [u32; 52],
+    reserved19: [u32; 52],
     SHUTDNSTORE0: u32, /* !< (@ 0x00001400) Shutdown storage memory (byte 0) */
     SHUTDNSTORE1: u32, /* !< (@ 0x00001404) Shutdown storage memory (byte 1) */
     SHUTDNSTORE2: u32, /* !< (@ 0x00001408) Shutdown storage memory (byte 2) */
@@ -255,35 +255,35 @@ struct SYSCTL_SOCLOCK_Regs {
 struct SYSCTL_SECCFG_Regs {
     FWEPROTMAIN: u32, /* !< (@ 0x00003000) 1 Sector Write-Erase per bit starting at address
                       0x0 of flash */
-    RESERVED0: [u32; 5],
+    reserved0: [u32; 5],
     FRXPROTMAINSTART: u32, /* !< (@ 0x00003018) Flash RX Protection Start Address */
     FRXPROTMAINEND: u32,   /* !< (@ 0x0000301C) Flash RX Protection End Address */
     FIPPROTMAINSTART: u32, /* !< (@ 0x00003020) Flash IP Protection Start Address */
     FIPPROTMAINEND: u32,   /* !< (@ 0x00003024) Flash IP Protection End Address */
-    RESERVED1: [u32; 4],
+    reserved1: [u32; 4],
     FLBANKSWPPOLICY: u32, /* !< (@ 0x00003038) Flash Bank Swap Policy */
     FLBANKSWP: u32,       /* !< (@ 0x0000303C) Flash MAIN bank address swap */
-    RESERVED2: u32,
+    reserved2: u32,
     FWENABLE: u32,  /* !< (@ 0x00003044) Security Firewall Enable Register */
     SECSTATUS: u32, /* !< (@ 0x00003048) Security Configuration  status */
-    RESERVED3: [u32; 5],
+    reserved3: [u32; 5],
     INITDONE: u32, /* !< (@ 0x00003060) INITCODE PASS */
 }
 
 #[repr(C)]
 struct SYSCTL_Regs {
-    RESERVED0: [u32; 1024],
+    reserved0: [u32; 1024],
     SOCLOCK: SYSCTL_SOCLOCK_Regs, /* !< (@ 0x00001000) SYSCTL SOCLOCK Region */
-    RESERVED1: [u32; 1788],
+    reserved1: [u32; 1788],
     SECCFG: SYSCTL_SECCFG_Regs, /* !< (@ 0x00003000) SYSCTL SECCFG Region */
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn Reset() -> ! {
-    // const GPIOA: *mut GPIO_Reg = 0x400A0000 as *mut GPIO_Reg;
-    let GPIOA: &mut GPIO_Reg = GPIO_Reg::from_addr(0x400A0000);
-    let GPIOB: &mut GPIO_Reg = GPIO_Reg::from_addr(0x400A2000);
-    let GPIOC: &mut GPIO_Reg = GPIO_Reg::from_addr(0x400A4000);
+    // const GPIOA: *mut GpioReg = 0x400A0000 as *mut GpioReg;
+    let GPIOA: &mut GpioReg = GpioReg::from_addr(0x400A0000);
+    let GPIOB: &mut GpioReg = GpioReg::from_addr(0x400A2000);
+    let GPIOC: &mut GpioReg = GpioReg::from_addr(0x400A4000);
 
     const IOMUX_BASE: *mut IOMUX_Regs = 0x40428000 as *mut IOMUX_Regs;
     const GPIO_PIN_16: u32 = 0x00010000;
@@ -293,13 +293,13 @@ pub extern "C" fn Reset() -> ! {
     const GPIO_PIN_TEST: u32 = 0x200000;
     const SYSCTL: *mut SYSCTL_Regs = 0x400AF000 as *mut SYSCTL_Regs;
 
-    GPIOA.gpio_reset();
-    GPIOB.gpio_reset();
-    GPIOC.gpio_reset();
+    GPIOA.reset();
+    GPIOB.reset();
+    GPIOC.reset();
 
-    GPIOA.gpio_enable_power();
-    GPIOB.gpio_enable_power();
-    GPIOC.gpio_enable_power();
+    GPIOA.enable_power();
+    GPIOB.enable_power();
+    GPIOC.enable_power();
 
     unsafe {
         (*IOMUX_BASE).SECCFG.PINCM[41] = 0x80 | 0x1;
