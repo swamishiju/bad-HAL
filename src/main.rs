@@ -150,7 +150,7 @@ impl GpioReg {
     fn pin_high(&mut self, pins: u32) {
         self.DOUTSET31_0 = pins;
     }
-    fn gpio_enable_output(&mut self, pins: u32) {
+    fn enable_output(&mut self, pins: u32) {
         self.DOESET31_0 = pins;
     }
 
@@ -281,9 +281,9 @@ struct SYSCTL_Regs {
 #[unsafe(no_mangle)]
 pub extern "C" fn Reset() -> ! {
     // const GPIOA: *mut GpioReg = 0x400A0000 as *mut GpioReg;
-    let GPIOA: &mut GpioReg = GpioReg::from_addr(0x400A0000);
-    let GPIOB: &mut GpioReg = GpioReg::from_addr(0x400A2000);
-    let GPIOC: &mut GpioReg = GpioReg::from_addr(0x400A4000);
+    let gpioA: &mut GpioReg = GpioReg::from_addr(0x400A0000);
+    let gpioB: &mut GpioReg = GpioReg::from_addr(0x400A2000);
+    let gpioC: &mut GpioReg = GpioReg::from_addr(0x400A4000);
 
     const IOMUX_BASE: *mut IOMUX_Regs = 0x40428000 as *mut IOMUX_Regs;
     const GPIO_PIN_16: u32 = 0x00010000;
@@ -293,13 +293,13 @@ pub extern "C" fn Reset() -> ! {
     const GPIO_PIN_TEST: u32 = 0x200000;
     const SYSCTL: *mut SYSCTL_Regs = 0x400AF000 as *mut SYSCTL_Regs;
 
-    GPIOA.reset();
-    GPIOB.reset();
-    GPIOC.reset();
+    gpioA.reset();
+    gpioB.reset();
+    gpioC.reset();
 
-    GPIOA.enable_power();
-    GPIOB.enable_power();
-    GPIOC.enable_power();
+    gpioA.enable_power();
+    gpioB.enable_power();
+    gpioC.enable_power();
 
     unsafe {
         (*IOMUX_BASE).SECCFG.PINCM[41] = 0x80 | 0x1;
@@ -314,21 +314,21 @@ pub extern "C" fn Reset() -> ! {
     const LED3: u32 = GPIO_PIN_9;
     const LED_TEST: u32 = GPIO_PIN_TEST;
 
-    GPIOA.pin_low(LED1);
-    GPIOA.gpio_enable_output(LED1);
-    GPIOB.pin_low(LED2);
-    GPIOB.gpio_enable_output(LED2);
-    GPIOB.pin_low(LED3);
-    GPIOB.gpio_enable_output(LED3);
+    gpioA.pin_low(LED1);
+    gpioA.enable_output(LED1);
+    gpioB.pin_low(LED2);
+    gpioB.enable_output(LED2);
+    gpioB.pin_low(LED3);
+    gpioB.enable_output(LED3);
 
     unsafe {
         (*SYSCTL).SOCLOCK.BORTHRESHOLD = 0;
         (*SYSCTL).SOCLOCK.HSCLKEN &= !(1 as u32);
     }
 
-    GPIOA.pin_low(LED1);
-    GPIOB.pin_low(LED2);
-    GPIOB.pin_low(LED3);
+    gpioA.pin_low(LED1);
+    gpioB.pin_low(LED2);
+    gpioB.pin_low(LED3);
     // GPIOA.pin_high(LED1);
     // GPIOB.pin_high(LED3);
 
@@ -350,29 +350,29 @@ pub extern "C" fn Reset() -> ! {
         // LED1 = Green
         // LED2 = Green
         // LED3 = Green
-        GPIOA.pin_high(LED1);
+        gpioA.pin_high(LED1);
         delay(Duration::from_millis(
             (((1.0 + sine(state)) / 2.0) * 10.0) as /* hi */ u64,
         ));
-        GPIOA.pin_low(LED1);
+        gpioA.pin_low(LED1);
         delay(Duration::from_millis(
             (((1.0 - sine(state)) / 2.0) * 10.0) as /* hi */ u64,
         ));
 
-        GPIOB.pin_high(LED2);
+        gpioB.pin_high(LED2);
         delay(Duration::from_millis(
             (((1.0 + sine(state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
         ));
-        GPIOB.pin_low(LED2);
+        gpioB.pin_low(LED2);
         delay(Duration::from_millis(
             (((1.0 - sine(state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
         ));
 
-        GPIOB.pin_high(LED3);
+        gpioB.pin_high(LED3);
         delay(Duration::from_millis(
             (((1.0 + sine(state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
         ));
-        GPIOB.pin_low(LED3);
+        gpioB.pin_low(LED3);
         delay(Duration::from_millis(
             (((1.0 - sine(state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
         ));
