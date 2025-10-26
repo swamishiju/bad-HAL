@@ -131,25 +131,25 @@ pub extern "C" fn Reset() -> ! {
         delay(Duration::from_millis(
             (((1.0 + sine(state)) / 2.0) * 10.0) as /* hi */ u64,
         ));
-        GPIOA.pin_low(LED1);
+        gpioA.pin_low(LED1);
         delay(Duration::from_millis(
             (((1.0 - sine(state)) / 2.0) * 10.0) as /* hi */ u64,
         ));
 
-        GPIOB.pin_high(LED2);
+        gpioB.pin_high(LED2);
         delay(Duration::from_millis(
             (((1.0 + sine(state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
         ));
-        GPIOB.pin_low(LED2);
+        gpioB.pin_low(LED2);
         delay(Duration::from_millis(
             (((1.0 - sine(state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
         ));
 
-        GPIOB.pin_high(LED3);
+        gpioB.pin_high(LED3);
         delay(Duration::from_millis(
             (((1.0 + sine(state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
         ));
-        GPIOB.pin_low(LED3);
+        gpioB.pin_low(LED3);
         delay(Duration::from_millis(
             (((1.0 - sine(state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
         ));
