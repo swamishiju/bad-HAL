@@ -1,4 +1,3 @@
-
 #[repr(C)]
 struct GpioGPRCMRegs {
     PWREN: u32,
@@ -141,9 +140,7 @@ impl GpioReg {
     pub fn gpio_toggle(&mut self, pins: u32) {
         self.DOUTTGL31_0 = pins;
     }
-
-    #[inline(always)]
-    pub fn from_addr(addr: u32) -> &'static mut Self {
-        unsafe { &mut *(addr as *mut Self) }
-    }
 }
+
+use crate::utils::MemoryMapped;
+impl MemoryMapped for GpioReg {}

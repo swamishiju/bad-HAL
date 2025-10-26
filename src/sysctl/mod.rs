@@ -1,4 +1,3 @@
-
 #[repr(C)]
 pub struct SYSCTL_SOCLOCK_Regs {
     reserved0: [u32; 8],
@@ -24,7 +23,7 @@ pub struct SYSCTL_SOCLOCK_Regs {
     reserved10: [u32; 33],
     SYSOSCCFG: u32,   /* !< (@ 0x00001100) SYSOSC configuration */
     MCLKCFG: u32,     /* !< (@ 0x00001104) Main clock (MCLK) configuration */
-    pub HSCLKEN: u32,     /* !< (@ 0x00001108) High-speed clock (HSCLK) source enable/disable */
+    pub HSCLKEN: u32, /* !< (@ 0x00001108) High-speed clock (HSCLK) source enable/disable */
     HSCLKCFG: u32,    /* !< (@ 0x0000110C) High-speed clock (HSCLK) source selection */
     HFCLKCLKCFG: u32, /* !< (@ 0x00001110) High-frequency clock (HFCLK) configuration */
     LFCLKCFG: u32,    /* !< (@ 0x00001114) Low frequency crystal oscillator (LFXT)
@@ -95,3 +94,6 @@ pub struct SYSCTL_Regs {
     reserved1: [u32; 1788],
     SECCFG: SYSCTL_SECCFG_Regs, /* !< (@ 0x00003000) SYSCTL SECCFG Region */
 }
+
+use crate::utils::MemoryMapped;
+impl MemoryMapped for SYSCTL_Regs {}

@@ -9,4 +9,5 @@ pub struct IOMUX_Regs {
     pub SECCFG: IOMUX_SECCFG_Regs,
 }
 
-
+use crate::utils::MemoryMapped;
+impl MemoryMapped for IOMUX_Regs {}

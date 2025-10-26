@@ -2,14 +2,25 @@
 #![no_main]
 
 mod gpio;
-mod sysctl;
 mod iomux;
+mod sysctl;
+mod uart;
+
 use crate::gpio::GpioReg;
-use crate::sysctl::SYSCTL_Regs;
 use crate::iomux::IOMUX_Regs;
+use crate::sysctl::SYSCTL_Regs;
+use crate::uart::clk_config::{DL_UART_ClockConfig, DL_UART_CLOCK, DL_UART_CLOCK_DIVIDE_RATIO};
+use crate::uart::uart_config::{
+    DL_UART_Config, DL_UART_DIRECTION, DL_UART_FLOW_CONTROL, DL_UART_MODE, DL_UART_PARITY,
+    DL_UART_STOP_BITS, DL_UART_WORD_LENGTH,
+};
+use crate::uart::oversampling_config::{DL_UART_OVERSAMPLING_RATE};
+use crate::uart::fifo_config::{DL_UART_TX_FIFO_LEVEL, DL_UART_RX_FIFO_LEVEL};
+use crate::uart::UART_Regs;
 use core::{f64::consts::PI, panic::PanicInfo, time::Duration};
 
-// #[unsafe(link_section = "intvecs")]
+mod utils;
+use crate::utils::MemoryMapped;
 
 unsafe extern "C" {
     static mut __sbss: u32;
@@ -21,42 +32,83 @@ unsafe extern "C" {
 
 }
 
+fn UART_init(uart: &mut UART_Regs) {
+    let clock_config = DL_UART_ClockConfig {
+        clockSel: DL_UART_CLOCK::DL_UART_CLOCK_BUSCLK,
+        divideRatio: DL_UART_CLOCK_DIVIDE_RATIO::DL_UART_CLOCK_DIVIDE_RATIO_1,
+    };
+
+    let uart_config = DL_UART_Config {
+        mode: DL_UART_MODE::DL_UART_MODE_NORMAL,
+        direction: DL_UART_DIRECTION::DL_UART_DIRECTION_TX_RX,
+        flowControl: DL_UART_FLOW_CONTROL::DL_UART_FLOW_CONTROL_NONE,
+        parity: DL_UART_PARITY::DL_UART_PARITY_NONE,
+        wordLength: DL_UART_WORD_LENGTH::DL_UART_WORD_LENGTH_8_BITS,
+        stopBits: DL_UART_STOP_BITS::DL_UART_STOP_BITS_ONE,
+    };
+
+    uart.set_clk_config(clock_config);
+    uart.uart_init(uart_config);
+    uart.set_oversampling(DL_UART_OVERSAMPLING_RATE::DL_UART_OVERSAMPLING_RATE_16X);
+    uart.set_baud_rate_divisor(208, 21);
+
+    uart.enable_fifos();
+    uart.set_rx_fifo_threshold(DL_UART_RX_FIFO_LEVEL::DL_UART_RX_FIFO_LEVEL_FULL);
+    uart.set_tx_fifo_threshold(DL_UART_TX_FIFO_LEVEL::DL_UART_TX_FIFO_LEVEL_EMPTY);
+
+    uart.enable();
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn Reset() -> ! {
-    // const GPIOA: *mut GpioReg = 0x400A0000 as *mut GpioReg;
     let GPIOA: &mut GpioReg = GpioReg::from_addr(0x400A0000);
     let GPIOB: &mut GpioReg = GpioReg::from_addr(0x400A2000);
     let GPIOC: &mut GpioReg = GpioReg::from_addr(0x400A4000);
 
-    const IOMUX_BASE: *mut IOMUX_Regs = 0x40428000 as *mut IOMUX_Regs;
+    let IOMUX: &mut IOMUX_Regs = IOMUX_Regs::from_addr(0x40428000);
+    let SYSCTL: &mut SYSCTL_Regs = SYSCTL_Regs::from_addr(0x400AF000);
+
+    let UART0: &mut UART_Regs = UART_Regs::from_addr(0x40108000);
+    const UART0_freq: u32 = 32000000;
+    const UART0_INT_IRQN: u32 = 15;
+    const UART0_BAUD_RATE: u32 = 9600;
+
+    const GPIO_PIN_9: u32 = 0x200;
+    const GPIO_PIN_10: u32 = 0x00000400;
+    const GPIO_PIN_11: u32 = 0x00000800;
     const GPIO_PIN_16: u32 = 0x00010000;
     const GPIO_PIN_23: u32 = 0x800000;
-    const GPIO_PIN_10: u32 = 0x400;
-    const GPIO_PIN_9: u32 = 0x200;
     const GPIO_PIN_TEST: u32 = 0x200000;
-    const SYSCTL: *mut SYSCTL_Regs = 0x400AF000 as *mut SYSCTL_Regs;
 
     GPIOA.reset();
     GPIOB.reset();
     GPIOC.reset();
+    UART0.reset();
 
     GPIOA.enable_power();
     GPIOB.enable_power();
     GPIOC.enable_power();
+    UART0.enable_power();
 
-    unsafe {
-        (*IOMUX_BASE).SECCFG.PINCM[41] = 0x80 | 0x1;
-        (*IOMUX_BASE).SECCFG.PINCM[66] = 0x80 | 0x1;
-        (*IOMUX_BASE).SECCFG.PINCM[30] = 0x80 | 0x1;
-        (*IOMUX_BASE).SECCFG.PINCM[29] = 0x80 | 0x1;
-        (*IOMUX_BASE).SECCFG.PINCM[55] = 0x80 | 0x1;
-    }
+    IOMUX.SECCFG.PINCM[24] = 0x80 | 0x2;
+    IOMUX.SECCFG.PINCM[25] = 0x80 | 0x2;
+
+    IOMUX.SECCFG.PINCM[41] = 0x80 | 0x1;
+    IOMUX.SECCFG.PINCM[66] = 0x80 | 0x1;
+    IOMUX.SECCFG.PINCM[30] = 0x80 | 0x1;
+    IOMUX.SECCFG.PINCM[29] = 0x80 | 0x1;
+    IOMUX.SECCFG.PINCM[55] = 0x80 | 0x1;
 
     const LED1: u32 = GPIO_PIN_16;
     const LED2: u32 = GPIO_PIN_10;
     const LED3: u32 = GPIO_PIN_9;
     const LED_TEST: u32 = GPIO_PIN_TEST;
 
+    UART_init(UART0);
+    UART0.transmit(&0x61);
+    UART0.transmit(&0x61);
+    UART0.transmit(&0x61);
+    UART0.transmit(&0x61);
     GPIOA.pin_low(LED1);
     GPIOA.gpio_enable_output(LED1);
     GPIOB.pin_low(LED2);
@@ -64,35 +116,17 @@ pub extern "C" fn Reset() -> ! {
     GPIOB.pin_low(LED3);
     GPIOB.gpio_enable_output(LED3);
 
-    unsafe {
-        (*SYSCTL).SOCLOCK.BORTHRESHOLD = 0;
-        (*SYSCTL).SOCLOCK.HSCLKEN &= !(1 as u32);
-    }
+    SYSCTL.SOCLOCK.BORTHRESHOLD = 0;
+    SYSCTL.SOCLOCK.HSCLKEN &= !(1 as u32);
 
     GPIOA.pin_low(LED1);
     GPIOB.pin_low(LED2);
     GPIOB.pin_low(LED3);
-    // GPIOA.pin_high(LED1);
-    // GPIOB.pin_high(LED3);
-
-    // unsafe { core::arch::asm!("ldr r2, =69") };
-    // unsafe { core::arch::asm!("ldr r3, =69") };
-    // unsafe { core::arch::asm!("ldr r4, =69") };
 
     let mut brightness = 0.0;
     let mut state = 0.0;
 
     loop {
-        // gpio_toggle(GPIOA, LED1 | LED_TEST);
-        // GPIOB
-        // LED2 | LED3 = RED
-        // LED1 = Green
-        // LED2 = YELLOW
-        // LED3 = NOTHING
-        // GPIOA
-        // LED1 = Green
-        // LED2 = Green
-        // LED3 = Green
         GPIOA.pin_high(LED1);
         delay(Duration::from_millis(
             (((1.0 + sine(state)) / 2.0) * 10.0) as /* hi */ u64,
