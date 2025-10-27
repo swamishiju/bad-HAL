@@ -24,9 +24,6 @@ SECTIONS
     *(.text*)
     *(.rodata*)
     *(.const*)
-    *(.cinit*)
-    *(.pinit*)
-    *(.init_array*)
   } > FLASH
 
   .data : AT (ADDR(.text) + SIZEOF(.text))
