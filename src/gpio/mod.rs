@@ -111,6 +111,33 @@ pub struct GpioReg {
     SUB1CFG: u32, /* !< (@ 0x00001520) Subscriber 1 configuration */
 }
 
+pub fn Gpio_Init() -> (
+	&'static mut GpioReg,
+	&'static mut GpioReg,
+	&'static mut GpioReg
+)   {
+    let GPIOA: &mut GpioReg = GpioReg::from_addr(0x400A0000);
+    let GPIOB: &mut GpioReg = GpioReg::from_addr(0x400A2000);
+    let GPIOC: &mut GpioReg = GpioReg::from_addr(0x400A4000);
+
+      
+    
+    GPIOA.reset();
+    GPIOB.reset();
+    GPIOC.reset();
+    
+    GPIOA.enable_power();
+    GPIOB.enable_power();
+    GPIOC.enable_power();  
+    
+    (GPIOA,GPIOB,GPIOC)    
+    
+}
+	
+
+
+
+
 impl GpioReg {
     pub fn reset(&mut self) {
         const GPIO_RSTCTL_KEY_UNLOCK_W: u32 = 0xB1000000;

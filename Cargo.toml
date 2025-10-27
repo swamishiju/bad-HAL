@@ -3,4 +3,8 @@ name = "bootyshaker0l2228"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+alt_linker = []
+
 [dependencies]
+
