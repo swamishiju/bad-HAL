@@ -127,8 +127,8 @@ impl UART_Regs {
         self.CTL0 &= !UART_CTL0_ENABLE_MASK;
     }
 
-    pub fn transmit(&mut self, data: &u32) {
-        self.TXDATA = *data;
+    pub fn transmit(&mut self, data: &u8) {
+        self.TXDATA = *data as u32;
     }
 }
 
