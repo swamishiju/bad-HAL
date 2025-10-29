@@ -9,14 +9,14 @@ mod uart;
 use crate::gpio::GpioReg;
 use crate::iomux::IOMUX_Regs;
 use crate::sysctl::SYSCTL_Regs;
-use crate::uart::clk_config::{DL_UART_ClockConfig, DL_UART_CLOCK, DL_UART_CLOCK_DIVIDE_RATIO};
+use crate::uart::UART_Regs;
+use crate::uart::clk_config::{DL_UART_CLOCK, DL_UART_CLOCK_DIVIDE_RATIO, DL_UART_ClockConfig};
+use crate::uart::fifo_config::{DL_UART_RX_FIFO_LEVEL, DL_UART_TX_FIFO_LEVEL};
+use crate::uart::oversampling_config::DL_UART_OVERSAMPLING_RATE;
 use crate::uart::uart_config::{
     DL_UART_Config, DL_UART_DIRECTION, DL_UART_FLOW_CONTROL, DL_UART_MODE, DL_UART_PARITY,
     DL_UART_STOP_BITS, DL_UART_WORD_LENGTH,
 };
-use crate::uart::oversampling_config::{DL_UART_OVERSAMPLING_RATE};
-use crate::uart::fifo_config::{DL_UART_TX_FIFO_LEVEL, DL_UART_RX_FIFO_LEVEL};
-use crate::uart::UART_Regs;
 use core::{f64::consts::PI, panic::PanicInfo, time::Duration};
 
 mod utils;
@@ -36,9 +36,6 @@ const GPIO_PIN_16: u32 = 0x00010000;
 const GPIO_PIN_23: u32 = 0x800000;
 const GPIO_PIN_TEST: u32 = 0x200000;
 
-
-
-
 unsafe extern "C" {
     static mut __sbss: u32;
     static mut __ebss: u32;
@@ -49,37 +46,36 @@ unsafe extern "C" {
 
 }
 
-
 /*
 Does some pwm and makes rainbow led
 
 */
-fn RainbowLed (
+fn RainbowLed(
     GPIOA: &'static mut GpioReg,
-	GPIOB: &'static mut GpioReg ,
-	GPIOC: &'static mut GpioReg ,
-	mut bright:f64,
-	mut state:f64
-	) -> ! {
+    GPIOB: &'static mut GpioReg,
+    GPIOC: &'static mut GpioReg,
+    mut bright: f64,
+    mut state: f64,
+) -> ! {
     const LED1: u32 = GPIO_PIN_16;
     const LED2: u32 = GPIO_PIN_10;
     const LED3: u32 = GPIO_PIN_9;
     const LED_TEST: u32 = GPIO_PIN_TEST;
-    
+
     GPIOA.pin_low(LED1);
     GPIOA.gpio_enable_output(LED1);
     GPIOB.pin_low(LED2);
     GPIOB.gpio_enable_output(LED2);
     GPIOB.pin_low(LED3);
     GPIOB.gpio_enable_output(LED3);
-    
+
     GPIOA.pin_low(LED1);
     GPIOB.pin_low(LED2);
     GPIOB.pin_low(LED3);
-    
+
     let mut brightness = bright;
     let mut state = state;
-    
+
     loop {
         GPIOA.pin_high(LED1);
         delay(Duration::from_millis(
@@ -115,19 +111,16 @@ fn RainbowLed (
             state = 0.0;
         }
     }
-    
-
 }
 
-fn Main() -> !{
-	
-    let (GPIOA,GPIOB,GPIOC) = gpio::Gpio_Init(); // initializes the gpio ports and enables power
+fn Main() -> ! {
+    let (GPIOA, GPIOB, GPIOC) = gpio::Gpio_Init(); // initializes the gpio ports and enables power
 
     let IOMUX: &mut IOMUX_Regs = IOMUX_Regs::from_addr(0x40428000);
     let SYSCTL: &mut SYSCTL_Regs = SYSCTL_Regs::from_addr(0x400AF000);
 
     let UART0: &mut UART_Regs = UART_Regs::from_addr(0x40108000);
-    
+
     UART0.reset();
     UART0.enable_power();
 
@@ -141,21 +134,33 @@ fn Main() -> !{
     IOMUX.SECCFG.PINCM[55] = 0x80 | 0x1;
 
     UART_init(UART0);
-    UART0.transmit(&0x61);
-    UART0.transmit(&0x61);
-    UART0.transmit(&0x61);
-    UART0.transmit(&0x61);
+
+    loop {
+        UART0.transmit_str("rk was here");
+        delay(Duration::from_millis(50));
+
+        // UART0.transmit('r' as u8);
+        // UART0.transmit('k' as u8);
+        // UART0.transmit(' ' as u8);
+        // UART0.transmit('w' as u8);
+        // delay(Duration::from_millis(50));
+        // UART0.transmit('a' as u8);
+        // UART0.transmit('s' as u8);
+        // UART0.transmit(' ' as u8);
+        // UART0.transmit('h' as u8);
+        // delay(Duration::from_millis(50));
+        // UART0.transmit('e' as u8);
+        // UART0.transmit('r' as u8);
+        // UART0.transmit('e' as u8);
+        // UART0.transmit('e' as u8);
+        // delay(Duration::from_millis(50));
+    }
 
     SYSCTL.SOCLOCK.BORTHRESHOLD = 0;
     SYSCTL.SOCLOCK.HSCLKEN &= !(1 as u32);
 
-    RainbowLed(GPIOA,GPIOB,GPIOC,1.00,0.00);
-    
+    RainbowLed(GPIOA, GPIOB, GPIOC, 1.00, 0.00);
 }
-
-
-
-
 
 fn UART_init(uart: &mut UART_Regs) {
     let clock_config = DL_UART_ClockConfig {

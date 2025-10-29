@@ -127,8 +127,27 @@ impl UART_Regs {
         self.CTL0 &= !UART_CTL0_ENABLE_MASK;
     }
 
-    pub fn transmit(&mut self, data: &u8) {
-        self.TXDATA = *data as u32;
+    #[inline(always)]
+    pub fn transmit(&mut self, data: u8) {
+        self.TXDATA = data as u32;
+    }
+
+    pub fn transmit_str(&mut self, data: &str) {
+        for i in 0..=(data.len() / 4) {
+            let c1: u32 = data.bytes().nth(i * 4 + 0).unwrap_or(0x20).into();
+            let c2: u32 = data.bytes().nth(i * 4 + 1).unwrap_or(0x20).into();
+            let c3: u32 = data.bytes().nth(i * 4 + 2).unwrap_or(0x20).into();
+            let c4: u32 = data.bytes().nth(i * 4 + 3).unwrap_or(0x20).into();
+
+            self.TXDATA = c1 << 24 | c1 << 16 | c1 << 8 | c1;
+            self.TXDATA = c2 << 24 | c2 << 16 | c2 << 8 | c2;
+            self.TXDATA = c3 << 24 | c3 << 16 | c3 << 8 | c3;
+            self.TXDATA = c4 << 24 | c4 << 16 | c4 << 8 | c4;
+
+            for _ in 0..(33 * 50) {
+                unsafe { core::arch::asm!("nop") };
+            }
+        }
     }
 }
 
