@@ -25,6 +25,7 @@ SECTIONS
     *(.rodata*)
     *(.const*)
   } > FLASH
+	
 
   .data : AT (ADDR(.text) + SIZEOF(.text))
   {
@@ -52,6 +53,11 @@ SECTIONS
   /* Optional config sections */
   .BCRConfig : { KEEP(*(.BCRConfig*)) } > BCR_CONFIG
   .BSLConfig : { KEEP(*(.BSLConfig*)) } > BSL_CONFIG
+  
 
-  /DISCARD/ : { *(.eh_frame*) }
+  /DISCARD/ : { 
+  *(.eh_frame*)
+  *(.stab*)
+  *(.debug*)
+   }
 }
