@@ -22,7 +22,7 @@ struct GpioCpuIntRegs {
 }
 
 #[repr(C)]
-struct GPIO_GEN_EVENT0_Regs {
+struct GpioGenEvent0Regs {
     IIDX: u32, /* !< (@ 0x00001050) Interrupt index */
     reserved0: u32,
     IMASK: u32, /* !< (@ 0x00001058) Interrupt mask */
@@ -53,9 +53,9 @@ pub struct GpioReg {
     reserved5: u32,
     CPU_INT: GpioCpuIntRegs, /* !< (@ 0x00001020) */
     reserved6: u32,
-    GEN_EVENT0: GPIO_GEN_EVENT0_Regs, /* !< (@ 0x00001050) */
+    GEN_EVENT0: GpioGenEvent0Regs, /* !< (@ 0x00001050) */
     reserved7: u32,
-    GEN_EVENT1: GPIO_GEN_EVENT0_Regs, /* !< (@ 0x00001080) */
+    GEN_EVENT1: GpioGenEvent0Regs, /* !< (@ 0x00001080) */
     reserved8: [u32; 13],
     EVT_MODE: u32, /* !< (@ 0x000010E0) Event Mode */
     reserved9: [u32; 6],
@@ -111,32 +111,25 @@ pub struct GpioReg {
     SUB1CFG: u32, /* !< (@ 0x00001520) Subscriber 1 configuration */
 }
 
-pub fn Gpio_Init() -> (
-	&'static mut GpioReg,
-	&'static mut GpioReg,
-	&'static mut GpioReg
-)   {
-    let GPIOA: &mut GpioReg = GpioReg::from_addr(0x400A0000);
-    let GPIOB: &mut GpioReg = GpioReg::from_addr(0x400A2000);
-    let GPIOC: &mut GpioReg = GpioReg::from_addr(0x400A4000);
+pub fn gpio_init() -> (
+    &'static mut GpioReg,
+    &'static mut GpioReg,
+    &'static mut GpioReg,
+) {
+    let gpio_a: &mut GpioReg = GpioReg::from_addr(0x400A0000);
+    let gpio_b: &mut GpioReg = GpioReg::from_addr(0x400A2000);
+    let gpio_c: &mut GpioReg = GpioReg::from_addr(0x400A4000);
 
-      
-    
-    GPIOA.reset();
-    GPIOB.reset();
-    GPIOC.reset();
-    
-    GPIOA.enable_power();
-    GPIOB.enable_power();
-    GPIOC.enable_power();  
-    
-    (GPIOA,GPIOB,GPIOC)    
-    
+    gpio_a.reset();
+    gpio_b.reset();
+    gpio_c.reset();
+
+    gpio_a.enable_power();
+    gpio_b.enable_power();
+    gpio_c.enable_power();
+
+    (gpio_a, gpio_b, gpio_c)
 }
-	
-
-
-
 
 impl GpioReg {
     pub fn reset(&mut self) {
