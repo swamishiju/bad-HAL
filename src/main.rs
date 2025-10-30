@@ -113,8 +113,8 @@ fn RainbowLed(
     }
 }
 
-fn Main() -> ! {
-    let (GPIOA, GPIOB, GPIOC) = gpio::Gpio_Init(); // initializes the gpio ports and enables power
+fn main() -> ! {
+    let (GPIOA, GPIOB, GPIOC) = gpio::gpio_init(); // initializes the gpio ports and enables power
 
     let IOMUX: &mut IOMUX_Regs = IOMUX_Regs::from_addr(0x40428000);
     let SYSCTL: &mut SYSCTL_Regs = SYSCTL_Regs::from_addr(0x400AF000);
@@ -191,7 +191,7 @@ fn UART_init(uart: &mut UART_Regs) {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn Reset() {
-    Main();
+    main();
 }
 
 #[inline(always)]
