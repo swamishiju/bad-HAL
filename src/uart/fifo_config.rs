@@ -14,21 +14,21 @@ pub enum DL_UART_RX_FIFO_LEVEL {
     DL_UART_RX_FIFO_LEVEL_1_4_FULL = 0x00000010,  // Interrupt triggers when FIFO >= 1/4 full
 }
 
-use crate::uart::UART_Regs;
+use crate::uart::UartRegs;
 use crate::utils::update_reg;
-impl UART_Regs {
+impl UartRegs {
     pub fn enable_fifos(&mut self) {
         let UART_CTL0_FEN_ENABLE: u32 = 0x00020000;
-        self.CTL0 |= UART_CTL0_FEN_ENABLE;
+        self.ctl0 |= UART_CTL0_FEN_ENABLE;
     }
 
     pub fn set_rx_fifo_threshold(&mut self, threshold: DL_UART_RX_FIFO_LEVEL) {
         let UART_IFLS_RXIFLSEL_MASK = 0x00000070;
-        update_reg(&mut self.IFLS, threshold as u32, UART_IFLS_RXIFLSEL_MASK);
+        update_reg(&mut self.ifls, threshold as u32, UART_IFLS_RXIFLSEL_MASK);
     }
 
     pub fn set_tx_fifo_threshold(&mut self, threshold: DL_UART_TX_FIFO_LEVEL) {
         let UART_IFLS_RXIFLSEL_MASK = 0x00000007;
-        update_reg(&mut self.IFLS, threshold as u32, UART_IFLS_RXIFLSEL_MASK);
+        update_reg(&mut self.ifls, threshold as u32, UART_IFLS_RXIFLSEL_MASK);
     }
 }

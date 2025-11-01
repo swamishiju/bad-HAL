@@ -9,14 +9,13 @@ mod uart;
 use crate::gpio::GpioReg;
 use crate::iomux::IOMUX_Regs;
 use crate::sysctl::SYSCTL_Regs;
-use crate::uart::UART_Regs;
 use crate::uart::clk_config::{DL_UART_CLOCK, DL_UART_CLOCK_DIVIDE_RATIO, DL_UART_ClockConfig};
 use crate::uart::fifo_config::{DL_UART_RX_FIFO_LEVEL, DL_UART_TX_FIFO_LEVEL};
-use crate::uart::oversampling_config::DL_UART_OVERSAMPLING_RATE;
+use crate::uart::oversampling_config::UartOversamplingRate;
 use crate::uart::uart_config::{
-    DL_UART_Config, DL_UART_DIRECTION, DL_UART_FLOW_CONTROL, DL_UART_MODE, DL_UART_PARITY,
-    DL_UART_STOP_BITS, DL_UART_WORD_LENGTH,
+    UartConfig, UartDirection, UartFlowControl, UartMode, UartParity, UartStopBits, UartWordLength,
 };
+use crate::uart::{UartRegs, oversampling_config};
 use core::{f64::consts::PI, panic::PanicInfo, time::Duration};
 
 mod utils;
@@ -25,7 +24,7 @@ use crate::utils::MemoryMapped;
 /*
 Defining all the addresses for gpio and uart
 */
-const UART0_freq: u32 = 32000000;
+const UART0_FREQ: u32 = 32000000;
 const UART0_INT_IRQN: u32 = 15;
 const UART0_BAUD_RATE: u32 = 9600;
 
@@ -113,7 +112,7 @@ fn main() -> ! {
     let IOMUX: &mut IOMUX_Regs = IOMUX_Regs::from_addr(0x40428000);
     let SYSCTL: &mut SYSCTL_Regs = SYSCTL_Regs::from_addr(0x400AF000);
 
-    let UART0: &mut UART_Regs = UART_Regs::from_addr(0x40108000);
+    let UART0: &mut UartRegs = UartRegs::from_addr(0x40108000);
 
     UART0.reset();
     UART0.enable_power();
@@ -127,7 +126,7 @@ fn main() -> ! {
     IOMUX.SECCFG.PINCM[29] = 0x80 | 0x1;
     IOMUX.SECCFG.PINCM[55] = 0x80 | 0x1;
 
-    UART_init(UART0);
+    uart_init(UART0);
 
     let mut state = 0.0;
     loop {
@@ -139,24 +138,24 @@ fn main() -> ! {
     SYSCTL.SOCLOCK.HSCLKEN &= !(1 as u32);
 }
 
-fn UART_init(uart: &mut UART_Regs) {
+fn uart_init(uart: &mut UartRegs) {
     let clock_config = DL_UART_ClockConfig {
         clockSel: DL_UART_CLOCK::DL_UART_CLOCK_BUSCLK,
         divideRatio: DL_UART_CLOCK_DIVIDE_RATIO::DL_UART_CLOCK_DIVIDE_RATIO_1,
     };
 
-    let uart_config = DL_UART_Config {
-        mode: DL_UART_MODE::DL_UART_MODE_NORMAL,
-        direction: DL_UART_DIRECTION::DL_UART_DIRECTION_TX_RX,
-        flowControl: DL_UART_FLOW_CONTROL::DL_UART_FLOW_CONTROL_NONE,
-        parity: DL_UART_PARITY::DL_UART_PARITY_NONE,
-        wordLength: DL_UART_WORD_LENGTH::DL_UART_WORD_LENGTH_8_BITS,
-        stopBits: DL_UART_STOP_BITS::DL_UART_STOP_BITS_ONE,
+    let uart_config = UartConfig {
+        mode: UartMode::Normal,
+        direction: UartDirection::TxRx,
+        flow_control: UartFlowControl::None,
+        parity: UartParity::None,
+        word_length: UartWordLength::Bits8,
+        stop_bits: UartStopBits::One,
     };
 
     uart.set_clk_config(clock_config);
     uart.uart_init(uart_config);
-    uart.set_oversampling(DL_UART_OVERSAMPLING_RATE::DL_UART_OVERSAMPLING_RATE_16X);
+    uart.set_oversampling(UartOversamplingRate::Rate16x);
     uart.set_baud_rate_divisor(208, 21);
 
     uart.enable_fifos();
@@ -183,10 +182,6 @@ fn sine(t: f64) -> f64 {
         16.0 * t * (PI - t) / (5.0 * PI * PI - 4.0 * t * (PI - t))
     }
 }
-
-// 40% 60%
-// 1000 1500
-// 400 600
 
 fn delay(duration: Duration) {
     for _ in 0..(duration.as_millis() * 33) {

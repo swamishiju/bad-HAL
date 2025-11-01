@@ -20,10 +20,10 @@ pub struct DL_UART_ClockConfig {
     pub divideRatio: DL_UART_CLOCK_DIVIDE_RATIO, // Selects the divide ratio. One of @ref DL_UART_CLOCK_DIVIDE_RATIO
 }
 
-use crate::uart::UART_Regs;
-impl UART_Regs {
+use crate::uart::UartRegs;
+impl UartRegs {
     pub fn set_clk_config(&mut self, config: DL_UART_ClockConfig) {
-        self.CLKSEL = config.clockSel as u32;
-        self.CLKDIV = config.divideRatio as u32;
+        self.clksel = config.clockSel as u32;
+        self.clkdiv = config.divideRatio as u32;
     }
 }
