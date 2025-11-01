@@ -72,30 +72,33 @@ fn rainbow_led(
     GPIOB.pin_low(LED3);
 
     GPIOA.pin_high(LED1);
+
+    const PWM_CYCLE: f64 = 5.0;
+
     delay(Duration::from_millis(
-        (((1.0 + sine(*state)) / 2.0) * 10.0) as /* hi */ u64,
+        (((1.0 + sine(*state)) / 2.0) * PWM_CYCLE) as /* hi */ u64,
     ));
     GPIOA.pin_low(LED1);
     delay(Duration::from_millis(
-        (((1.0 - sine(*state)) / 2.0) * 10.0) as /* hi */ u64,
+        (((1.0 - sine(*state)) / 2.0) * PWM_CYCLE) as /* hi */ u64,
     ));
 
     GPIOB.pin_high(LED2);
     delay(Duration::from_millis(
-        (((1.0 + sine(*state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
+        (((1.0 + sine(*state + 2.094)) / 2.0) * PWM_CYCLE) as /* hi */ u64,
     ));
     GPIOB.pin_low(LED2);
     delay(Duration::from_millis(
-        (((1.0 - sine(*state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
+        (((1.0 - sine(*state + 2.094)) / 2.0) * PWM_CYCLE) as /* hi */ u64,
     ));
 
     GPIOB.pin_high(LED3);
     delay(Duration::from_millis(
-        (((1.0 + sine(*state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
+        (((1.0 + sine(*state + 4.188)) / 2.0) * PWM_CYCLE) as /* hi */ u64,
     ));
     GPIOB.pin_low(LED3);
     delay(Duration::from_millis(
-        (((1.0 - sine(*state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
+        (((1.0 - sine(*state + 4.188)) / 2.0) * PWM_CYCLE) as /* hi */ u64,
     ));
 
     // GPIOB.gpio_toggle(LED2);
@@ -130,10 +133,19 @@ fn main() -> ! {
 
     SYSCTL.soc_lock.hsclk_en &= !(1 as u32);
     SYSCTL.soc_lock.bor_threshold = 0;
+
     let mut state = 0.0;
+
+    const LED1: u32 = GPIO_PIN_16;
+    GPIOA.pin_low(LED1);
+    GPIOA.enable_output(LED1);
     loop {
-        UART0.transmit_str("rk was here");
-        rainbow_led(GPIOA, GPIOB, GPIOC, &mut state);
+        GPIOA.pin_low(LED1);
+        let byte = UART0.recieve_byte_blocking();
+        GPIOA.pin_high(LED1);
+        UART0.transmit(byte as u8);
+        // UART0.transmit_str("uart goes br");
+        // rainbow_led(GPIOA, GPIOB, GPIOC, &mut state);
     }
 }
 

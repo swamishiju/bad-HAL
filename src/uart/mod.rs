@@ -133,15 +133,47 @@ impl UartRegs {
     }
 
     pub fn transmit_str(&mut self, data: &str) {
-        let bytes = data.as_bytes();
-        for chunk in bytes.chunks(4) {
-            for &byte in chunk {
-                self.txdata = byte as u32;
-                for _ in 0..(33 * 20) {
-                    unsafe { core::arch::asm!("nop") };
-                }
+        for i in 0..=(data.len() / 4) {
+            let c1: u32 = data.bytes().nth(i * 4 + 0).unwrap_or(0x20).into();
+            let c2: u32 = data.bytes().nth(i * 4 + 1).unwrap_or(0x20).into();
+            let c3: u32 = data.bytes().nth(i * 4 + 2).unwrap_or(0x20).into();
+            let c4: u32 = data.bytes().nth(i * 4 + 3).unwrap_or(0x20).into();
+
+            // self.txdata = c1 << 24 | c1 << 16 | c1 << 8 | c1;
+            // self.txdata = c2 << 24 | c2 << 16 | c2 << 8 | c2;
+            // self.txdata = c3 << 24 | c3 << 16 | c3 << 8 | c3;
+            // self.txdata = c4 << 24 | c4 << 16 | c4 << 8 | c4;
+            //
+            //
+
+            self.txdata = c1;
+            self.txdata = c2;
+            self.txdata = c3;
+            self.txdata = c4;
+
+            for _ in 0..(33 * 20) {
+                unsafe { core::arch::asm!("nop") };
             }
         }
+    }
+
+    pub fn recieve_byte_blocking(&self) -> char {
+        while self.is_fifo_empty() {}
+
+        self.recieve_data()
+    }
+
+    fn recieve_data(&self) -> char {
+        const UART_RXDATA_DATA_MASK: u32 = 0x000000FF;
+        (self.rxdata & UART_RXDATA_DATA_MASK) as u8 as char
+    }
+
+    #[inline(always)]
+    fn is_fifo_empty(&self) -> bool {
+        const UART_STAT_RXFE_MASK: u32 = 0x00000004;
+        const UART_STAT_RXFE_SET: u32 = 0x00000004;
+
+        (self.stat & UART_STAT_RXFE_MASK) == UART_STAT_RXFE_SET
     }
 }
 
