@@ -9,13 +9,13 @@ mod uart;
 use crate::gpio::GpioReg;
 use crate::iomux::IOMUX_Regs;
 use crate::sysctl::SYSCTL_Regs;
+use crate::uart::UartRegs;
 use crate::uart::clk_config::{DL_UART_CLOCK, DL_UART_CLOCK_DIVIDE_RATIO, DL_UART_ClockConfig};
 use crate::uart::fifo_config::{DL_UART_RX_FIFO_LEVEL, DL_UART_TX_FIFO_LEVEL};
 use crate::uart::oversampling_config::UartOversamplingRate;
 use crate::uart::uart_config::{
     UartConfig, UartDirection, UartFlowControl, UartMode, UartParity, UartStopBits, UartWordLength,
 };
-use crate::uart::{UartRegs, oversampling_config};
 use core::{f64::consts::PI, panic::PanicInfo, time::Duration};
 
 mod utils;
