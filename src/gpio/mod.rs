@@ -116,9 +116,9 @@ pub fn gpio_init() -> (
     &'static mut GpioReg,
     &'static mut GpioReg,
 ) {
-    let gpio_a: &mut GpioReg = GpioReg::from_addr(0x400A0000);
-    let gpio_b: &mut GpioReg = GpioReg::from_addr(0x400A2000);
-    let gpio_c: &mut GpioReg = GpioReg::from_addr(0x400A4000);
+    let gpio_a = GpioReg::from_addr(0x400A0000);
+    let gpio_b = GpioReg::from_addr(0x400A2000);
+    let gpio_c = GpioReg::from_addr(0x400A4000);
 
     gpio_a.reset();
     gpio_b.reset();

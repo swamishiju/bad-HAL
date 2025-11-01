@@ -51,12 +51,11 @@ Does some pwm and makes rainbow led
 
 */
 fn RainbowLed(
-    GPIOA: &'static mut GpioReg,
-    GPIOB: &'static mut GpioReg,
-    GPIOC: &'static mut GpioReg,
-    mut bright: f64,
-    mut state: f64,
-) -> ! {
+    GPIOA: &mut GpioReg,
+    GPIOB: &mut GpioReg,
+    GPIOC: &mut GpioReg,
+    state: &mut f64,
+) -> () {
     const LED1: u32 = GPIO_PIN_16;
     const LED2: u32 = GPIO_PIN_10;
     const LED3: u32 = GPIO_PIN_9;
@@ -73,43 +72,38 @@ fn RainbowLed(
     GPIOB.pin_low(LED2);
     GPIOB.pin_low(LED3);
 
-    let mut brightness = bright;
-    let mut state = state;
+    GPIOA.pin_high(LED1);
+    delay(Duration::from_millis(
+        (((1.0 + sine(*state)) / 2.0) * 10.0) as /* hi */ u64,
+    ));
+    GPIOA.pin_low(LED1);
+    delay(Duration::from_millis(
+        (((1.0 - sine(*state)) / 2.0) * 10.0) as /* hi */ u64,
+    ));
 
-    loop {
-        GPIOA.pin_high(LED1);
-        delay(Duration::from_millis(
-            (((1.0 + sine(state)) / 2.0) * 10.0) as /* hi */ u64,
-        ));
-        GPIOA.pin_low(LED1);
-        delay(Duration::from_millis(
-            (((1.0 - sine(state)) / 2.0) * 10.0) as /* hi */ u64,
-        ));
+    GPIOB.pin_high(LED2);
+    delay(Duration::from_millis(
+        (((1.0 + sine(*state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
+    ));
+    GPIOB.pin_low(LED2);
+    delay(Duration::from_millis(
+        (((1.0 - sine(*state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
+    ));
 
-        GPIOB.pin_high(LED2);
-        delay(Duration::from_millis(
-            (((1.0 + sine(state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
-        ));
-        GPIOB.pin_low(LED2);
-        delay(Duration::from_millis(
-            (((1.0 - sine(state + 2.094)) / 2.0) * 10.0) as /* hi */ u64,
-        ));
+    GPIOB.pin_high(LED3);
+    delay(Duration::from_millis(
+        (((1.0 + sine(*state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
+    ));
+    GPIOB.pin_low(LED3);
+    delay(Duration::from_millis(
+        (((1.0 - sine(*state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
+    ));
 
-        GPIOB.pin_high(LED3);
-        delay(Duration::from_millis(
-            (((1.0 + sine(state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
-        ));
-        GPIOB.pin_low(LED3);
-        delay(Duration::from_millis(
-            (((1.0 - sine(state + 4.188)) / 2.0) * 10.0) as /* hi */ u64,
-        ));
-
-        // GPIOB.gpio_toggle(LED2);
-        // delay(Duration::from_millis(1000));
-        state += 0.08;
-        if state > 2.0 * PI {
-            state = 0.0;
-        }
+    // GPIOB.gpio_toggle(LED2);
+    // delay(Duration::from_millis(1000));
+    *state += 0.08;
+    if *state > 2.0 * PI {
+        *state = 0.0;
     }
 }
 
@@ -135,31 +129,14 @@ fn main() -> ! {
 
     UART_init(UART0);
 
+    let mut state = 0.0;
     loop {
         UART0.transmit_str("rk was here");
-        delay(Duration::from_millis(50));
-
-        // UART0.transmit('r' as u8);
-        // UART0.transmit('k' as u8);
-        // UART0.transmit(' ' as u8);
-        // UART0.transmit('w' as u8);
-        // delay(Duration::from_millis(50));
-        // UART0.transmit('a' as u8);
-        // UART0.transmit('s' as u8);
-        // UART0.transmit(' ' as u8);
-        // UART0.transmit('h' as u8);
-        // delay(Duration::from_millis(50));
-        // UART0.transmit('e' as u8);
-        // UART0.transmit('r' as u8);
-        // UART0.transmit('e' as u8);
-        // UART0.transmit('e' as u8);
-        // delay(Duration::from_millis(50));
+        RainbowLed(GPIOA, GPIOB, GPIOC, &mut state);
     }
 
     SYSCTL.SOCLOCK.BORTHRESHOLD = 0;
     SYSCTL.SOCLOCK.HSCLKEN &= !(1 as u32);
-
-    RainbowLed(GPIOA, GPIOB, GPIOC, 1.00, 0.00);
 }
 
 fn UART_init(uart: &mut UART_Regs) {
